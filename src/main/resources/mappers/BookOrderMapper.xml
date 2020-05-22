@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nove.shbtp.dao.BookOrderDao">
+
+	<insert id="addBookOrder" parameterType="com.nove.shbtp.pojo.BookOrder">
+		insert into book_order (bid,sell_uid,buy_uid,consignee,phone_number,location,address,express_company,express_number,mode,state)
+		values(#{bid},#{sell_uid},#{buy_uid},#{consignee},#{phone_number},#{location},#{address},#{express_company},#{express_number},#{mode},#{state})
+	</insert>
+
+	<select id="selectBookOrderBySellerUid" resultType="com.nove.shbtp.pojo.BookOrder" parameterType="Integer">
+		select * from book_order where sell_uid = #{sell_uid}
+	</select>
+
+	<select id="selectBookOrderByBuyerUid" resultType="com.nove.shbtp.pojo.BookOrder" parameterType="Integer">
+		select * from book_order where buy_uid = #{buy_uid}
+	</select>
+
+	<select id="selectBookOrderByOid" resultType="com.nove.shbtp.pojo.BookOrder" parameterType="Integer">
+		select * from book_order where oid = #{oid}
+	</select>
+
+	<update id="updateBookOrder" parameterType="com.nove.shbtp.pojo.BookOrder">
+		update book_order
+		<set>
+			<if test="express_company!=null and express_company!='' ">express_company=#{express_company},</if>
+			<if test="express_number!=null and express_number!=''">express_number=#{express_number},</if>
+			<if test="mode!=null and mode!=''">mode=#{mode},</if>
+			<if test="state!=null and state!=''">state=#{state},</if>
+		</set>
+		<where>
+			<if test="oid!=null and oid!='0'.toString">oid=#{oid}</if>
+		</where>
+	</update>
+	<!--删除用户时 其他表中的相关信息应一同删除-->
+	<delete id="deleteBookOrder" parameterType="int">
+		delete book_order where oid = #{oid}
+	</delete>
+	
+
+
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        https://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/mvc
+        https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+        <context:component-scan base-package="com.nove.shbtp"></context:component-scan>
+        <mvc:annotation-driven></mvc:annotation-driven>
+
+        <!--<bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+                <!--<property name="prefix" value="/WEB-INF/pages/"></property>-->
+                <!--<property name="suffix" value=".jsp"></property>-->
+        <!--</bean>-->
+
+        <!--<bean id="conversionServiceFactoryBean" class="org.springframework.context.support.ConversionServiceFactoryBean">-->
+                <!--<property name="converters">-->
+                        <!--<set>-->
+                                <!--<bean class="com.nove.utils.SpringToDateConverter"></bean>-->
+                        <!--</set>-->
+                <!--</property>-->
+        <!--</bean>-->
+        <!--<mvc:annotation-driven conversion-service="conversionServiceFactoryBean"></mvc:annotation-driven>-->
+        <!--<bean id="mutipartResolver"-->
+              <!--class="org.springframework.web.multipart.commons.CommonsMultipartResolver"-->
+              <!--p:defaultEncoding="UTF-8"-->
+              <!--p:maxUploadSize="5400000"-->
+        <!--/>-->
+        <bean id="multipartResolver"
+              class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+                <!--上传文件的最大大小，单位为字节 -->
+                <property name="maxUploadSize" value="17367648787"></property>
+
+                <!-- 上传文件的编码 -->
+                <property name="defaultEncoding" value="UTF-8"></property>
+        </bean>
+
+
+
+        <!--mybatis配置-->
+
+
+        <!-- 	创建数据源 -->
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+                <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+                <property name="url" value="jdbc:mysql://localhost:3306/shbtp?serverTimezone=UTC"></property>
+                <property name="username" value="root"></property>
+                <property name="password" value="123456"></property>
+        </bean>
+        <!-- 	创建事务管理器 -->
+        <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+                <property name="dataSource" ref="dataSource"></property>
+        </bean>
+
+        <!--使用注解事务 -->
+        <tx:annotation-driven transaction-manager="txManager"/>
+
+        <bean id = "sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+                <property name="dataSource" ref="dataSource"></property>
+                <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        </bean>
+
+        <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+                <property name="basePackage" value="com.nove.shbtp.dao"></property>
+                <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+
+        </bean>
+</beans>

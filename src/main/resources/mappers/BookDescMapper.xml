@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nove.shbtp.dao.BookDescDao">
+
+	<insert id="addBookDesc" parameterType="com.nove.shbtp.pojo.BookDesc">
+		insert into book_desc (bid,text_desc,picture_url)
+		values(#{bid},#{text_desc},#{picture_url})
+	</insert>
+
+	<select id="selectBookDescByBid" resultType="com.nove.shbtp.pojo.BookDesc" parameterType="Integer">
+		select * from book_desc where bid = #{bid}
+	</select>
+
+	<select id="selectAllBookDesc" resultType="com.nove.shbtp.pojo.BookDesc">
+		select * from book_desc
+	</select>
+
+
+	<update id="updateBookDese" parameterType="com.nove.shbtp.pojo.BookDesc">
+		update book_desc
+		<set>
+			<if test="text_desc!=null ">text_desc=#{text_desc},</if>
+			<if test="picture_url!=null and picture_url!=''">picture_url=#{picture_url}</if>
+		</set>
+		<where>
+			<if test="bid!=null and bid!='0'.toString">bid=#{bid}</if>
+		</where>
+	</update>
+	<!--删除用户时 其他表中的相关信息应一同删除-->
+	<delete id="deleteBookDesc" parameterType="int">
+		delete book_dase where bid = #{bid}
+	</delete>
+	
+
+
+</mapper>

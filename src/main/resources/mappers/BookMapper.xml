@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nove.shbtp.dao.BookDao">
+
+    <resultMap id="bookAndBookDesc" type="com.nove.shbtp.pojo.Book">
+        <id property="bid" column="bid"/>
+        <result property="uid" column="uid"/>
+        <result property="book_name" column="book_name"/>
+        <result property="author" column="author"/>
+        <result property="publisher" column="publisher"/>
+        <result property="publishingTime" column="publishingTime"/>
+        <result property="ISBN" column="ISBN"/>
+        <result property="data_from" column="data_from"/>
+        <result property="category" column="category"/>
+        <result property="grade" column="grade"/>
+        <result property="price" column="price"/>
+        <result property="location" column="location"/>
+        <result property="state" column="state"/>
+        <result property="create_time" column="create_time"/>
+        <association property="bookDesc" column="bid" javaType="com.nove.shbtp.pojo.BookDesc"
+                     select="com.nove.shbtp.dao.BookDescDao.selectBookDescByBid"/>
+    </resultMap>
+
+    <select id="selectBookByBid" parameterType="Integer" resultMap="bookAndBookDesc">
+        select * from book_base where bid = #{bid}
+    </select>
+
+    <select id="selectBookByUid" parameterType="Integer" resultMap="bookAndBookDesc">
+        select * from book_base where uid = #{uid}
+    </select>
+
+    <select id="selectBook" parameterType="com.nove.shbtp.dto.BookSelectParam" resultMap="bookAndBookDesc">
+        <if test="location!=null and location!=''">
+          <bind name="like_location" value="'%' + location + '%'"/>
+        </if>
+        select * from book_base
+        <where>
+            <if test="content!=null and content!=''">
+                MATCH (book_name,author,publisher) AGAINST (#{content} IN NATURAL LANGUAGE MODE)
+            </if>
+            <if test="uid &gt; '0'.toString">
+                and uid = #{uid}
+            </if>
+            <if test="ISBN!=null and ISBN!=''">
+                and ISBN = #{ISBN}
+            </if>
+            <if test="category!=null and category!=''">
+                and category = #{category}
+            </if>
+            <if test="grade &gt;= '0'.toString">
+                and grade &lt;= #{grade}
+            </if>
+            <if test="priceMin &gt;= '0'.toString">
+                and price &gt;= #{priceMin}
+            </if>
+            <if test="priceMax &gt;= '0'.toString">
+                and price &lt;= #{priceMax}
+            </if>
+            <if test="location!=null and location!=''">
+                and location like #{like_location}
+            </if>
+            <if test="state &gt;= '0'.toString">
+                and state = #{state}
+            </if>
+            <if test="limitBidStart &gt; '0'.toString">
+                and bid &gt;= #{limitBidStart}
+            </if>
+            <if test="uploadTime &gt; '0'.toString">
+                and TO_DAYS(NOW()) - TO_DAYS(create_time) &lt;= #{uploadTime}
+            </if>
+            <if test="orderByClause!=null">
+                order by ${orderByClause}
+            </if>
+
+            <if test="limitCount!='0'.toString">
+                limit #{limitStart} ,#{limitCount}
+            </if>
+        </where>
+
+
+    </select>
+
+    <insert id="addBook" parameterType="com.nove.shbtp.pojo.Book" keyProperty="bid" useGeneratedKeys="true">
+        insert into book_base
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="uid!=null and uid!='0'.toString">uid,</if>
+            <if test="book_name!=null and book_name!=''">book_name,</if>
+            <if test="author!=null and author!=''">author,</if>
+            <if test="publisher!=null and publisher!=''">publisher,</if>
+            <if test="publishingTime!=null and publishingTime!=''">publishingTime,</if>
+            <if test="ISBN!=null and ISBN!=''">ISBN,</if>
+            <if test="data_from!=null">data_from,</if>
+            <if test="category!=null and category!=''">category,</if>
+            <if test="grade!=null">grade,</if>
+            <if test="price!=null" >price,</if>
+            <if test="location!=null and location!=''">location,</if>
+            <if test="state!=null">state,</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="uid!=null and uid!='0'.toString">#{uid},</if>
+            <if test="book_name!=null and book_name!=''">#{book_name},</if>
+            <if test="author!=null and author!=''">#{author},</if>
+            <if test="publisher!=null and publisher!=''">#{publisher},</if>
+            <if test="publishingTime!=null and publishingTime!=''">#{publishingTime},</if>
+            <if test="ISBN!=null and ISBN!=''">#{ISBN},</if>
+            <if test="data_from!=null">#{data_from},</if>
+            <if test="category!=null and category!=''">#{category},</if>
+            <if test="grade!=null">#{grade},</if>
+            <if test="price!=null">#{price},</if>
+            <if test="location!=null and location!=''">#{location},</if>
+            <if test="state!=null">#{state},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBook" parameterType="com.nove.shbtp.pojo.Book">
+        update book_base
+        <set>
+            <if test="book_name!=null and book_name!=''">book_name = #{book_name},</if>
+            <if test="author!=null and author!=''">author = #{author},</if>
+            <if test="publisher!=null and publisher!=''">publisher = #{publisher},</if>
+            <if test="publishingTime!=null and publishingTime!=''">publishingTime = #{publishingTime},</if>
+            <if test="ISBN!=null and ISBN!=''">ISBN = #{ISBN},</if>
+            <if test="data_from!=null">data_from = #{data_from},</if>
+            <if test="category!=null and category!=''">category = #{category},</if>
+            <if test="grade!=null">grade = #{grade},</if>
+            <if test="price!=null">price = #{price},</if>
+            <if test="location!=null and location!=''">location = #{location},</if>
+            <if test="state!=null">state = #{state},</if>
+        </set>
+        <where>
+            <if test="bid!=null and bid !='0'.toString">bid=#{bid}</if>
+        </where>
+    </update>
+
+    <delete id="deleteBook" parameterType="int">
+		delete book_base where bid = #{bid}
+	</delete>
+
+    <select id="selectUpdateTime" parameterType="int" resultType="java.util.Date">
+        select update_time from book_base where bid=#{bid};
+    </select>
+
+</mapper>
